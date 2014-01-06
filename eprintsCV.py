@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # A script that downloads a publication list from eprints and formats it for display on an academic website/web CV
+# Copyright Martin Paul Eve 2014
 
 """eprintsCV: a script that downloads a publication list from eprints and formats it for display on an academic website/web CV
 
@@ -18,13 +19,6 @@ from docopt import docopt
 import urllib2
 import json
 from datetime import datetime
-
-def to_unicode_or_bust(
-	obj, encoding='utf-8'):
-	if isinstance(obj, basestring):
-		if not isinstance(obj, unicode):
-			obj = unicode(obj, encoding)
-	return obj
 
 def printableHeading(x):
 	return {
