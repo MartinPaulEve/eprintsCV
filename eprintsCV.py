@@ -20,10 +20,18 @@ import urllib2
 import json
 from datetime import datetime
 
+def printStart():
+	print "<ul>"
+
+def printEnd():
+	print "</ul>"
+
 def printableHeading(x):
 	return {
 		'book': "Books",
 		'article': "Journal Articles",
+		'book_section': "Book Chapters",
+		'conference_item': "Conference Papers/Events",
 	}[x]
 
 def printHeading(heading):
@@ -44,7 +52,7 @@ def printItem(item, eprint_url):
 			creators = creators + str.format('{0}, {1}', creator['name']['family'].encode('utf8'), creator['name']['given'].encode('utf8'))
 
 	if item['type'] == 'book':
-		print str.format('<p>{0}, <a href="{4}"><i>{1}</i></a> ({2}: {3})</p>', creators, item['title'].encode('utf8'), item['publisher'].encode('utf8'), datetime.strptime(item['date'][0:4], "%Y").year, item['uri'])
+		print str.format('<li>{0}, <a href="{4}"><i>{1}</i></a> ({2}: {3})</li>', creators, item['title'].encode('utf8'), item['publisher'].encode('utf8'), datetime.strptime(item['date'][0:4], "%Y").year, item['uri'])
 
 	if item['type'] == "article":
 		# build the volume/number format
@@ -59,7 +67,25 @@ def printItem(item, eprint_url):
 				volume = ", "
 			volume = volume + str.format("({0})", str(item['number']))
 
-		print str.format('<p>{0}, "<a href="{5}">{1}</a>", <i>{2}</i>{3}, {4}</p>', creators, item['title'].encode('utf8'), item['publication'].encode('utf8'), volume, datetime.strptime(item['date'][0:4], "%Y").year, item['uri'])
+		print str.format('<li>{0}, "<a href="{5}">{1}</a>", <i>{2}</i>{3}, {4}</li>', creators, item['title'].encode('utf8'), item['publication'].encode('utf8'), volume, datetime.strptime(item['date'][0:4], "%Y").year, item['uri'])
+
+	if item['type'] == "book_section":
+		# generate the editors list
+		editors = ""
+
+		if 'editors' in item:
+			for editor in item['editors']:
+				if editors == "":
+					editors = ", ed. by "
+				if editors <> ", ed. by ":
+					editors = editors + ", "
+
+				editors = editors + str.format('{0}, {1}', editor['name']['family'].encode('utf8'), editor['name']['given'].encode('utf8'))
+
+		print str.format('<li>{0}, "<a href="{6}">{1}</a>", in <i>{2}</i>{3} ({4}: {5})</li>', creators, item['title'].encode('utf8'), item['book_title'].encode('utf8'), editors, item['publisher'].encode('utf8'), datetime.strptime(item['date'][0:4], "%Y").year, item['uri'])
+
+	if item['type'] == "conference_item":
+		print str.format('<li>{0}, "<a href="{4}">{1}</a>", <i>{2}</i> {3}</li>', creators, item['title'].encode('utf8'), item['event_title'].encode('utf8'), datetime.strptime(item['date'][0:4], "%Y").year, item['uri'])
 
 def main():
 	# read  command line arguments
@@ -89,11 +115,12 @@ def main():
 	for currentType in args['<list_of_types>'].split(","):
 		# display a heading
 		printHeading(currentType)
+		printStart()
 		for currentItem in jsonList:
 			if currentItem['type'] == currentType:
 				# this is an item of that type
 				printItem(currentItem, repo)
-
+		printEnd()
 
 if __name__ == '__main__':
     main()
