@@ -21,15 +21,15 @@ import json
 from datetime import datetime
 
 
-def printStart():
+def print_start():
     print "<ul>"
 
 
-def printEnd():
+def print_end():
     print "</ul>"
 
 
-def printableHeading(x):
+def printable_heading(x):
     return {
         'book': "Books",
         'article': "Journal Articles",
@@ -39,7 +39,7 @@ def printableHeading(x):
 
 
 def print_heading(heading):
-    print str.format("<h1>{0}</h1>", printableHeading(heading))
+    print str.format("<h1>{0}</h1>", printable_heading(heading))
 
 
 def print_item(item, eprint_url):
@@ -149,12 +149,12 @@ def main():
     for currentType in args['<list_of_types>'].split(","):
         # display a heading
         print_heading(currentType)
-        printStart()
+        print_start()
         for currentItem in json_list:
             if currentItem['type'] == currentType:
                 # this is an item of that type
                 print_item(currentItem, repo)
-        printEnd()
+        print_end()
 
 
 if __name__ == '__main__':
