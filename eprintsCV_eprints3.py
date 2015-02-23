@@ -50,12 +50,7 @@ def print_item(item, eprint_url):
         if creators <> "":
             creators += ", "
 
-        if 'id' in creator and creator['id'] is not None:
-            creators += str.format('<a href="{0}view/people/{3}.html">{1}, {2}</a>', eprint_url,
-                                   creator['name']['family'].encode('utf8'),
-                                   creator['name']['given'].encode('utf8'), creator['id'])
-        else:
-            creators += str.format('{0}, {1}', creator['name']['family'].encode('utf8'),
+        creators += str.format('{0}, {1}', creator['name']['family'].encode('utf8'),
                                    creator['name']['given'].encode('utf8'))
 
     if item['type'] == 'book':
