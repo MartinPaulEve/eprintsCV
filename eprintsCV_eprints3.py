@@ -5,7 +5,7 @@
 """eprintsCV: a script that downloads a publication list from eprints and formats it for display on an academic website/web CV
 
 Usage:
-    eprintsCV.py <eprints_location> <eprints_user> <list_of_types>
+    eprintsCV.py <eprints_location> <eprints_user> <list_of_types> [--dump]
     eprintsCV.py (-h | --help)
     eprintsCV.py --version
 
@@ -140,6 +140,10 @@ def main():
     # should this ever change, it would need a lamda sort:
     # jsonSorted = sorted(list_to_be_sorted, key=lambda k: k['date'])
     json_list = json.loads(json_data)
+
+    if args['--dump']:
+        print json_list
+        return
 
     for currentType in args['<list_of_types>'].split(","):
         # display a heading
