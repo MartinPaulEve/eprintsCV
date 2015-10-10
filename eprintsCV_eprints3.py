@@ -53,12 +53,16 @@ def print_item(item, eprint_url):
         creators += str.format('{0}, {1}', creator['name']['family'].encode('utf8'),
                                    creator['name']['given'].encode('utf8'))
 
+    try:
+        the_date = datetime.strptime(item['date'][0:4], "%Y").year
+    except:
+        the_date = "n.d."
+
     if item['type'] == 'book':
         print '<li>{0}, <a href="{4}"><i>{1}</i></a> ({2}: {3})</li>'.format(creators,
                                                                              item['title'].encode('utf8'),
                                                                              item['publisher'].encode('utf8'),
-                                                                             datetime.strptime(item['datestamp'][0:4],
-                                                                                               "%Y").year,
+                                                                             the_date,
                                                                              item['uri'])
 
     if item['type'] == "article":
@@ -76,8 +80,7 @@ def print_item(item, eprint_url):
                                                                                  item['title'].encode('utf8'),
                                                                                  item['publication'].encode('utf8'),
                                                                                  volume,
-                                                                                 datetime.strptime(
-                                                                                     item['datestamp'][0:4], "%Y").year,
+                                                                                 the_date,
                                                                                  item['uri'])
 
     if item['type'] == "book_section":
@@ -102,17 +105,14 @@ def print_item(item, eprint_url):
                                                                                           editors,
                                                                                           item['publisher'].encode(
                                                                                               'utf8'),
-                                                                                          datetime.strptime(
-                                                                                              item['datestamp'][0:4],
-                                                                                              "%Y").year,
+                                                                                          the_date,
                                                                                           item['uri'])
 
     if item['type'] == "conference_item":
         print ('<li>{0}, "<a href="{4}">{1}</a>", <i>{2}</i> {3}</li>'.format(creators,
                                                                               item['title'].encode('utf8'),
                                                                               item['event_title'].encode('utf8'),
-                                                                              datetime.strptime(item['datestamp'][0:4],
-                                                                                                "%Y").year,
+                                                                              the_date,
                                                                               item['uri']))
 
 
