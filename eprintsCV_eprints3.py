@@ -109,10 +109,11 @@ def print_item(item, eprint_url):
                                                                                           item['uri'])
 
     if item['type'] == "conference_item":
-        print ('<li>{0}, "<a href="{4}">{1}</a>", <i>{2}</i> {3}</li>'.format(creators,
+        print ('<li>{0}, "<a href="{5}">{1}</a>", <i>{2}</i>, {4}, {3}</li>'.format(creators,
                                                                               item['title'].encode('utf8'),
                                                                               item['event_title'].encode('utf8'),
                                                                               the_date,
+                                                                              item['event_location'],
                                                                               item['uri']))
 
 
