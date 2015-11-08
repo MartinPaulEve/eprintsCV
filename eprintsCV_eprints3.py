@@ -32,7 +32,7 @@ def print_end():
 def printable_heading(x):
     return {
         'book': "Books",
-        'article': "Journal Articles",
+        'article': "Articles",
         'book_section': "Book Chapters",
         'conference_item': "Conference Papers/Events",
     }[x]
@@ -45,6 +45,7 @@ def print_heading(heading):
 def print_item(item, eprint_url):
     # generate the creators list
     creators = ""
+    editors = ""
 
     for creator in item['creators']:
         if creators <> "":
@@ -53,17 +54,28 @@ def print_item(item, eprint_url):
         creators += str.format('{0}, {1}', creator['name']['family'].encode('utf8'),
                                    creator['name']['given'].encode('utf8'))
 
+    if 'editors' in item:
+      for editor in item['editors']:
+        if editors == "":
+          editors = ", ed. by "
+        if editors != ", ed. by ":
+          editors += ", "
+
+        editors += str.format('{0}, {1}', editor['name']['family'].encode('utf8'), editor['name']['given'].encode('utf8'))
+
     try:
         the_date = datetime.strptime(item['date'][0:4], "%Y").year
     except:
         the_date = "n.d."
 
     if item['type'] == 'book':
-        print '<li>{0}, <a href="{4}"><i>{1}</i></a> ({2}: {3})</li>'.format(creators,
-                                                                             item['title'].encode('utf8'),
-                                                                             item['publisher'].encode('utf8'),
-                                                                             the_date,
-                                                                             item['uri'])
+        print '<li>{0}, <a href="{4}"><i>{1}</i></a>{5} ({2}: {3})</li>'.format(creators,
+                                                                                 item['title'].encode('utf8'),
+                                                                                 item['publisher'].encode('utf8'),
+                                                                                 the_date,
+                                                                                 item['uri'],
+                                                                                 editors)
+    
 
     if item['type'] == "article":
         # build the volume/number format
@@ -84,19 +96,6 @@ def print_item(item, eprint_url):
                                                                                  item['uri'])
 
     if item['type'] == "book_section":
-    # generate the editors list
-        editors = ""
-
-        if 'editors' in item:
-            for editor in item['editors']:
-                if editors == "":
-                    editors = ", ed. by "
-                if editors != ", ed. by ":
-                    editors += editors + ", "
-
-            editors = editors + '{0}, {1}'.format(editor['name']['family'].encode('utf8'),
-                                                  editor['name']['given'].encode('utf8'))
-
         print '<li>{0}, &ldquo;<a href="{6}">{1}</a>&rdquo;, in <i>{2}</i>{3} ({4}: {5})</li>'.format(creators,
                                                                                           item['title'].encode(
                                                                                               'utf8'),
