@@ -32,6 +32,8 @@ def print_end():
 def printable_heading(x):
     return {
         'book': "Books",
+        'article_ref': "Articles in Peer-Reviewed Journals",
+        'article_nef': "Other Articles",
         'article': "Articles",
         'book_section': "Book Chapters",
         'conference_item': "Conference Papers/Events",
@@ -148,11 +150,25 @@ def main():
     for currentType in args['<list_of_types>'].split(","):
         # display a heading
         print_heading(currentType)
+
+        needs_ref = "ANY"
+        
+        if currentType.endswith("_ref"):
+          needs_ref = 'TRUE'
+          currentType = currentType[0:-4]
+        elif currentType.endswith("_nef"):
+          needs_ref = 'FALSE'
+          currentType = currentType[0:-4]
+
         print_start()
         for currentItem in json_list:
             if currentItem['type'] == currentType:
+              if needs_ref == "ANY":
+                print_item(currentItem, repo)
+              elif needs_ref <> "ANY" and 'refereed' in currentItem and currentItem['refereed'] == needs_ref:
                 # this is an item of that type
                 print_item(currentItem, repo)
+
         print_end()
 
 
