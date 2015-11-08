@@ -76,7 +76,7 @@ def print_item(item, eprint_url):
         elif 'number' in item and 'volume' in item:
             volume = ' {0}({1})'.format(str(item['volume']), str(item['number']))
 
-        print '<li>{0}, "<a href="{5}">{1}</a>", <i>{2}</i>{3}, {4}</li>'.format(creators,
+        print '<li>{0}, &ldquo;<a href="{5}">{1}</a>&rdquo;, <i>{2}</i>{3}, {4}</li>'.format(creators,
                                                                                  item['title'].encode('utf8'),
                                                                                  item['publication'].encode('utf8'),
                                                                                  volume,
@@ -97,7 +97,7 @@ def print_item(item, eprint_url):
             editors = editors + '{0}, {1}'.format(editor['name']['family'].encode('utf8'),
                                                   editor['name']['given'].encode('utf8'))
 
-        print '<li>{0}, "<a href="{6}">{1}</a>", in <i>{2}</i>{3} ({4}: {5})</li>'.format(creators,
+        print '<li>{0}, &ldquo;<a href="{6}">{1}</a>&rdquo;, in <i>{2}</i>{3} ({4}: {5})</li>'.format(creators,
                                                                                           item['title'].encode(
                                                                                               'utf8'),
                                                                                           item['book_title'].encode(
@@ -109,7 +109,7 @@ def print_item(item, eprint_url):
                                                                                           item['uri'])
 
     if item['type'] == "conference_item":
-        print ('<li>{0}, "<a href="{5}">{1}</a>", <i>{2}</i>, {4}, {3}</li>'.format(creators,
+        print ('<li>{0}, &ldquo;<a href="{5}">{1}</a>&rdquo;, <i>{2}</i>, {4}, {3}</li>'.format(creators,
                                                                               item['title'].encode('utf8'),
                                                                               item['event_title'].encode('utf8'),
                                                                               the_date,
