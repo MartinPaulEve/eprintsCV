@@ -33,8 +33,11 @@ def printable_heading(x):
     return {
         'book': "Books",
         'article_ref': "Articles in Peer-Reviewed Journals",
-        'article_nef': "Other Articles",
+        'article_ref_nev': "Articles in Peer-Reviewed Journals",
+        'article_nef_nev': "Other Articles",
+        'article_nev': "Other Articles",
         'article': "Articles",
+        'article_rev': "Reviews",
         'book_section': "Book Chapters",
         'conference_item': "Conference Papers/Events",
     }[x]
@@ -151,6 +154,17 @@ def main():
         # display a heading
         print_heading(currentType)
 
+        do_print = False
+
+        rev = "ANY"
+
+        if currentType.endswith("_rev"):
+          rev = 'TRUE'
+          currentType = currentType[0:-4]
+        elif currentType.endswith("_nev"):
+          rev = 'FALSE'
+          currentType = currentType[0:-4]
+
         needs_ref = "ANY"
         
         if currentType.endswith("_ref"):
@@ -164,9 +178,24 @@ def main():
         for currentItem in json_list:
             if currentItem['type'] == currentType:
               if needs_ref == "ANY":
-                print_item(currentItem, repo)
+                do_print = True
               elif needs_ref <> "ANY" and 'refereed' in currentItem and currentItem['refereed'] == needs_ref:
                 # this is an item of that type
+                do_print = True
+              else:
+                do_print = False
+
+              if do_print:
+                if rev == "ANY":
+                  do_print = True
+                elif rev == "TRUE" and currentItem['title'].encode('utf8').startswith("Review of"):
+                  do_print = True
+                elif rev == "FALSE" and currentItem['title'].encode('utf8').startswith("Review of") == False:
+                  do_print = True
+                else:
+                  do_print = False
+
+              if do_print:
                 print_item(currentItem, repo)
 
         print_end()
