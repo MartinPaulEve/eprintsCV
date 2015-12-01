@@ -32,6 +32,8 @@ def print_end():
 def printable_heading(x):
     return {
         'book': "Books",
+        'book_ned': "Books",
+        'book_ed': "Edited Volumes",
         'article_ref': "Articles in Peer-Reviewed Journals",
         'article_ref_nev': "Articles in Peer-Reviewed Journals",
         'article_nef_nev': "Other Articles",
@@ -52,21 +54,36 @@ def print_item(item, eprint_url):
     creators = ""
     editors = ""
 
-    for creator in item['creators']:
+    for creator in item['creators'][:-1]:
         if creators <> "":
             creators += ", "
 
-        creators += str.format('{0}, {1}', creator['name']['family'].encode('utf8'),
-                                   creator['name']['given'].encode('utf8'))
+        creators += str.format('{0}, {1}', creator['name']['family'].encode('utf8'), creator['name']['given'].encode('utf8'))
+
+    if creators <> "":
+        creators += ", and "
+
+    creator = item['creators'][-1]
+
+    creators += str.format('{0}, {1}', creator['name']['family'].encode('utf8'), creator['name']['given'].encode('utf8'))
 
     if 'editors' in item:
-      for editor in item['editors']:
+      for editor in item['editors'][:-1]:
         if editors == "":
           editors = ", ed. by "
         if editors != ", ed. by ":
           editors += ", "
 
         editors += str.format('{0}, {1}', editor['name']['family'].encode('utf8'), editor['name']['given'].encode('utf8'))
+
+      if editors == "":
+          editors = ", ed. by "
+      if editors != ", ed. by ":
+        editors += ", and "
+
+      editor = item['editors'][-1]
+
+      editors += str.format('{0}, {1}', editor['name']['family'].encode('utf8'), editor['name']['given'].encode('utf8'))
 
     try:
         the_date = datetime.strptime(item['date'][0:4], "%Y").year
@@ -174,6 +191,15 @@ def main():
           needs_ref = 'FALSE'
           currentType = currentType[0:-4]
 
+        ed = "ANY"
+
+        if currentType.endswith("_ed"):
+          ed = 'TRUE'
+          currentType = currentType[0:-3]
+        elif currentType.endswith("_ned"):
+          ed = 'FALSE'
+          currentType = currentType[0:-4]        
+
         print_start()
         for currentItem in json_list:
             if currentItem['type'] == currentType:
@@ -191,6 +217,18 @@ def main():
                 elif rev == "TRUE" and currentItem['title'].encode('utf8').startswith("Review of"):
                   do_print = True
                 elif rev == "FALSE" and currentItem['title'].encode('utf8').startswith("Review of") == False:
+                  do_print = True
+                else:
+                  do_print = False
+
+              if do_print:
+                if ed == "ANY":
+                  do_print = True
+                elif ed == "TRUE" and 'editors' in currentItem:
+                  # this is an item of that type
+                  do_print = True
+                elif ed == "FALSE" and not 'editors' in currentItem:
+                  # this is an item of that type
                   do_print = True
                 else:
                   do_print = False
