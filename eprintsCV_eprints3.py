@@ -133,17 +133,16 @@ def print_item(item, eprint_url):
     except:
         the_date = "n.d."
 
-    if item['type'] == 'book':
+    oa_status = ""
+    if 'oa_status' in item:
+        if item['oa_status'] == 'green' or item['oa_status'] == 'gold':
+            oa_color = 'goldenrod' if item['oa_status'] == 'gold' else item['oa_status']
+            if 'files' in item:
+                oa_status = "[<a href=\"" + item['files'][0]['url'] + "\" style=\"color:" + oa_color + "\">Download</a>]"
+            elif 'documents' in item:
+                oa_status = "[<a href=\"" + item['documents'][0]['uri'] + "\" style=\"color:" + oa_color + "\">Download</a>]"
 
-        oa_status = ""
-        if 'oa_status' in item:
-            if item['oa_status'] == 'green' or item['oa_status'] == 'gold':
-                if 'files' in item:
-                    oa_status = "[<a href=\"" + item['files'][0]['url'] + "\" style=\"color:" + item[
-                        'oa_status'] + "\">Download</a>]"
-                elif 'documents' in item:
-                    oa_status = "[<a href=\"" + item['documents'][0]['uri'] + "\" style=\"color:" + item[
-                        'oa_status'] + "\">Download</a>]"
+    if item['type'] == 'book':
 
         print '<li>{0}, <a href="{4}"><i>{1}</i></a>{5} ({2}: {3}) {6}</li>'.format(creators,
                                                                                 item['title'].encode('utf8'),
@@ -157,7 +156,6 @@ def print_item(item, eprint_url):
         creators_replaced = creators.replace('itempropreplace', 'itemprop="author"')
         # build the volume/number format
         volume = ""
-        oa_status = ""
 
         if 'volume' in item and not 'number' in item:
             volume = ' ({0})'.format(str(item['volume']))
@@ -165,15 +163,6 @@ def print_item(item, eprint_url):
             volume = ' {0}'.format(str(item['number']))
         elif 'number' in item and 'volume' in item:
             volume = ' {0}({1})'.format(str(item['volume']), str(item['number']))
-
-        if 'oa_status' in item:
-            if item['oa_status'] == 'green' or item['oa_status'] == 'gold':
-                if 'files' in item:
-                    oa_status = "[<a href=\"" + item['files'][0]['url'] + "\" style=\"color:" + item[
-                        'oa_status'] + "\">Download</a>]"
-                elif 'documents' in item:
-                    oa_status = "[<a href=\"" + item['documents'][0]['uri'] + "\" style=\"color:" + item[
-                        'oa_status'] + "\">Download</a>]"
 
         print '<li><span itemscope itemtype="http://schema.org/CreativeWork" itemid="{5}">{0}, &ldquo;<a href="{5}"><span itemprop="name">{1}</span></a>&rdquo;, <i><span itemscope itemtype="http://schema.org/Periodical"><span id="name">{2}</span></span></i>{3}, <span itemprop="datepublished">{4}</span></span> {6}</li>'.format(
             creators_replaced,
@@ -185,15 +174,6 @@ def print_item(item, eprint_url):
             oa_status)
 
     if item['type'] == "book_section":
-        oa_status = ""
-        if 'oa_status' in item:
-            if item['oa_status'] == 'green' or item['oa_status'] == 'gold':
-                if 'files' in item:
-                    oa_status = "[<a href=\"" + item['files'][0]['url'] + "\" style=\"color:" + item[
-                        'oa_status'] + "\">Download</a>]"
-                elif 'documents' in item:
-                    oa_status = "[<a href=\"" + item['documents'][0]['uri'] + "\" style=\"color:" + item[
-                        'oa_status'] + "\">Download</a>]"
 
         print '<li>{0}, &ldquo;<a href="{6}">{1}</a>&rdquo;, in <i>{2}</i>{3} ({4}: {5}) {7}</li>'.format(creators,
                                                                                                           item[
