@@ -48,7 +48,7 @@ def printable_heading(x):
 
 
 def print_heading(heading):
-    print str.format("<h1>{0}</h1>", printable_heading(heading))
+    print str.format("<h4>{0}</h4>", printable_heading(heading))
 
 
 def print_item(item, eprint_url):
