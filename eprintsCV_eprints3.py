@@ -140,7 +140,11 @@ def print_item(item, eprint_url):
             if 'files' in item:
                 oa_status = "[<a href=\"" + item['files'][0]['url'] + "\" style=\"color:" + oa_color + "\">Download</a>]"
             elif 'documents' in item:
-                oa_status = "[<a href=\"" + item['documents'][0]['uri'] + "\" style=\"color:" + oa_color + "\">Download</a>]"
+                if len(item['documents']) > 1:
+                    for doc in item['documents']:
+                        oa_status += " [<a href=\"" + doc['uri'] + "\" style=\"color:" + oa_color + "\">Download " + doc['formatdesc'] + "</a>]"
+                else:
+                    oa_status = "[<a href=\"" + item['documents'][0]['uri'] + "\" style=\"color:" + oa_color + "\">Download</a>]"
             else:
                 oa_status = "[<a href=\"mailto:martin.eve@bbk.ac.uk?subject=Request to read '" + item['title'].encode('utf8') + "'\">Email me to read</a>]"
     else:
