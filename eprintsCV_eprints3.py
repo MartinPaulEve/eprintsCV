@@ -1,6 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# coding=UTF-8
 # A script that downloads a publication list from eprints and formats it for display on an academic website/web CV
-# Copyright Martin Paul Eve 2014
+# Copyright Martin Paul Eve 2016
+# Requires python3
 
 """eprintsCV: a script that downloads a publication list from eprints and formats it for display on an academic website/web CV
 
@@ -15,20 +17,21 @@ Options:
     --version  Show version.
 """
 
-from docopt import docopt
-import urllib2
 import json
+from urllib.request import urlopen
 from datetime import datetime
+
+from docopt import docopt
 
 schemaids = {"Martin Paul Eve": 'itemid="https://www.martineve.com"'}
 
 
 def print_start():
-    print "<ul>"
+    print("<ul>")
 
 
 def print_end():
-    print "</ul>"
+    print("</ul>")
 
 
 def printable_heading(x):
@@ -48,7 +51,7 @@ def printable_heading(x):
 
 
 def print_heading(heading):
-    print str.format("<h4>{0}</h4>", printable_heading(heading))
+    print (str.format("<h4>{0}</h4>", printable_heading(heading)))
 
 
 def print_item(item, eprint_url):
@@ -58,55 +61,55 @@ def print_item(item, eprint_url):
     schemaid = ""
 
     for creator in item['creators'][:-1]:
-        if creators <> "":
+        if creators != "":
             creators += ", "
 
-        lookup = creator['name']['given'].encode('utf8') + " " + creator['name']['family'].encode('utf8')
+        lookup = creator['name']['given'] + " " + creator['name']['family']
 
         shouldcreate = False
 
         if lookup in schemaids:
             schemaid = schemaids[lookup]
         else:
-            schemaids[lookup] = 'itemid="https://www.martineve.com/' + creator['name']['given'].encode('utf8') + \
-                                creator['name']['family'].encode('utf8') + '"'
+            schemaids[lookup] = 'itemid="https://www.martineve.com/' + creator['name']['given'] + \
+                                creator['name']['family'] + '"'
             schemaid = schemaids[lookup]
             shouldcreate = True
 
         if shouldcreate:
             creators += str.format(
                 '<span itemtype="http://schema.org/Person" itemscope {2} itempropreplace><span itemprop="name"><span itemprop="familyName">{0}</span>, <span itemprop="givenName">{1}</span></span></span>',
-                creator['name']['family'].encode('utf8'), creator['name']['given'].encode('utf8'), schemaid)
+                creator['name']['family'], creator['name']['given'], schemaid)
         else:
             creators += str.format(
                 '<span itemtype="http://schema.org/Person" itemscope {2} itempropreplace>{0}, {1}</span>',
-                creator['name']['family'].encode('utf8'), creator['name']['given'].encode('utf8'), schemaid)
+                creator['name']['family'], creator['name']['given'], schemaid)
 
-    if creators <> "":
+    if creators != "":
         creators += ", and "
 
     creator = item['creators'][-1]
 
-    lookup = creator['name']['given'].encode('utf8') + " " + creator['name']['family'].encode('utf8')
+    lookup = creator['name']['given'] + " " + creator['name']['family']
 
     shouldcreate = False
 
     if lookup in schemaids:
         schemaid = schemaids[lookup]
     else:
-        schemaids[lookup] = 'itemid="https://www.martineve.com/' + creator['name']['given'].encode('utf8') + \
-                            creator['name']['family'].encode('utf8') + '"'
+        schemaids[lookup] = 'itemid="https://www.martineve.com/' + creator['name']['given'] + \
+                            creator['name']['family'] + '"'
         schemaid = schemaids[lookup]
         shouldcreate = True
 
     if shouldcreate:
         creators += str.format(
             '<span itemtype="http://schema.org/Person" itemscope {2} itempropreplace><span itemprop="name"><span itemprop="familyName">{0}</span>, <span itemprop="givenName">{1}</span></span></span>',
-            creator['name']['family'].encode('utf8'), creator['name']['given'].encode('utf8'), schemaid)
+            creator['name']['family'], creator['name']['given'], schemaid)
     else:
         creators += str.format(
             '<span itemtype="http://schema.org/Person" itemscope {2} itempropreplace>{0}, {1}</span>',
-            creator['name']['family'].encode('utf8'), creator['name']['given'].encode('utf8'), schemaid)
+            creator['name']['family'], creator['name']['given'], schemaid)
 
     if 'editors' in item:
         for editor in item['editors'][:-1]:
@@ -115,8 +118,8 @@ def print_item(item, eprint_url):
             if editors != ", ed. by ":
                 editors += ", "
 
-            editors += str.format('{0}, {1}', editor['name']['family'].encode('utf8'),
-                                  editor['name']['given'].encode('utf8'))
+            editors += str.format('{0}, {1}', editor['name']['family'],
+                                  editor['name']['given'])
 
         if editors == "":
             editors = ", ed. by "
@@ -125,8 +128,8 @@ def print_item(item, eprint_url):
 
         editor = item['editors'][-1]
 
-        editors += str.format('{0}, {1}', editor['name']['family'].encode('utf8'),
-                              editor['name']['given'].encode('utf8'))
+        editors += str.format('{0}, {1}', editor['name']['family'],
+                              editor['name']['given'])
 
     try:
         the_date = datetime.strptime(item['date'][0:4], "%Y").year
@@ -146,24 +149,29 @@ def print_item(item, eprint_url):
                 else:
                     oa_status = "[<a href=\"" + item['documents'][0]['uri'] + "\" style=\"color:" + oa_color + "\">Download</a>]"
             else:
-                oa_status = "[<a href=\"mailto:martin.eve@bbk.ac.uk?subject=Request to read '" + item['title'].encode('utf8') + "'\">Email me to read</a>]"
+                oa_status = "[<a href=\"mailto:martin.eve@bbk.ac.uk?subject=Request to read '" + item['title'] + "'\">Email me to read</a>]"
     else:
-        oa_status = "[<a href=\"mailto:martin.eve@bbk.ac.uk?subject=Request to read'" + item['title'].encode('utf8') + "'\">Email me to read</a>]"
+        oa_status = "[<a href=\"mailto:martin.eve@bbk.ac.uk?subject=Request to read'" + item['title'] + "'\">Email me to read</a>]"
 
     if 'oa_status' in item and item['oa_status'] == 'gold' and 'official_url' in item:
         item['uri'] = item['official_url']
+
+    # replace double quotation marks with singles
+    item['title'] = item['title'].replace('"', '\'')
+    item['title'] = item['title'].replace('“', '‘')
+    item['title'] = item['title'].replace('”', '’')
 
     if item['type'] == 'book':
         if 'mailto:' in oa_status:
             oa_status = ""
 
-        print '<li>{0}, <a href="{4}"><i>{1}</i></a>{5} ({2}: {3}) {6}</li>'.format(creators,
-                                                                                item['title'].encode('utf8'),
-                                                                                item['publisher'].encode('utf8'),
-                                                                                the_date,
-                                                                                item['uri'],
-                                                                                editors,
-                                                                                oa_status)
+        print('<li>{0}, <a href="{4}"><i>{1}</i></a>{5} ({2}: {3}) {6}</li>'.format(creators,
+                                                                                    item['title'],
+                                                                                    item['publisher'],
+                                                                                    the_date,
+                                                                                    item['uri'],
+                                                                                    editors,
+                                                                                    oa_status))
 
     if item['type'] == "article":
         creators_replaced = creators.replace('itempropreplace', 'itemprop="author"')
@@ -177,39 +185,33 @@ def print_item(item, eprint_url):
         elif 'number' in item and 'volume' in item:
             volume = ' {0}({1})'.format(str(item['volume']), str(item['number']))
 
-        print '<li><span itemscope itemtype="http://schema.org/CreativeWork" itemid="{5}">{0}, &ldquo;<a href="{5}"><span itemprop="name">{1}</span></a>&rdquo;, <i><span itemscope itemtype="http://schema.org/Periodical"><span id="name">{2}</span></span></i>{3}, <span itemprop="datepublished">{4}</span></span> {6}</li>'.format(
+        print ('<li><span itemscope itemtype="http://schema.org/CreativeWork" itemid="{5}">{0}, &ldquo;<a href="{5}"><span itemprop="name">{1}</span></a>&rdquo;, <i><span itemscope itemtype="http://schema.org/Periodical"><span id="name">{2}</span></span></i>{3}, <span itemprop="datepublished">{4}</span></span> {6}</li>'.format(
             creators_replaced,
-            item['title'].encode('utf8'),
-            item['publication'].encode('utf8'),
+            item['title'],
+            item['publication'],
             volume,
             the_date,
             item['uri'],
-            oa_status)
+            oa_status))
 
     if item['type'] == "book_section":
 
-        print '<li>{0}, &ldquo;<a href="{6}">{1}</a>&rdquo;, in <i>{2}</i>{3} ({4}: {5}) {7}</li>'.format(creators,
-                                                                                                          item[
-                                                                                                              'title'].encode(
-                                                                                                              'utf8'),
-                                                                                                          item[
-                                                                                                              'book_title'].encode(
-                                                                                                              'utf8'),
+        print ('<li>{0}, &ldquo;<a href="{6}">{1}</a>&rdquo;, in <i>{2}</i>{3} ({4}: {5}) {7}</li>'.format(creators,
+                                                                                                          item['title'],
+                                                                                                          item['book_title'],
                                                                                                           editors,
-                                                                                                          item[
-                                                                                                              'publisher'].encode(
-                                                                                                              'utf8'),
+                                                                                                          item['publisher'],
                                                                                                           the_date,
                                                                                                           item['uri'],
-                                                                                                          oa_status)
+                                                                                                          oa_status))
 
     if item['type'] == "conference_item":
         creators_replaced = creators.replace('itempropreplace', 'itemprop="performer"')
         print (
             '<li><span itemscope itemtype="http://schema.org/EducationEvent" itemid="{5}">{0}, &ldquo;<a href="{5}">{1}</a>&rdquo;, <i><span itemprop="name">{2}</span></i>, <span itemscope itemtype="http://schema.org/Place" itemprop="location"><span itemprop="address"><span itemprop="name">{4}</span></span></span>, <span itemprop="startDate">{3}</span></span></li>'.format(
                 creators_replaced,
-                item['title'].encode('utf8'),
-                item['event_title'].encode('utf8'),
+                item['title'],
+                item['event_title'],
                 the_date,
                 item['event_location'],
                 item['uri']))
@@ -231,8 +233,8 @@ def main():
     url = repo + "cgi/exportview/people/" + args['<eprints_user>'] + "/JSON/" + args['<eprints_user>'] + ".js"
 
     # download the JSON version
-    response = urllib2.urlopen(url)
-    json_data = response.read()
+    response = urlopen(url)
+    json_data = response.readall().decode('utf-8')
 
     # decode the JSON object into a list of dictionaries
     # NB that, helpfully, this list is by default reverse sorted (newest first)
@@ -241,7 +243,7 @@ def main():
     json_list = json.loads(json_data)
 
     if args['--dump']:
-        print json_list
+        print(json_list)
         return
 
     for currentType in args['<list_of_types>'].split(","):
@@ -282,7 +284,7 @@ def main():
             if currentItem['type'] == currentType:
                 if needs_ref == "ANY":
                     do_print = True
-                elif needs_ref <> "ANY" and 'refereed' in currentItem and currentItem['refereed'] == needs_ref:
+                elif needs_ref != "ANY" and 'refereed' in currentItem and currentItem['refereed'] == needs_ref:
                     # this is an item of that type
                     do_print = True
                 else:
@@ -291,9 +293,9 @@ def main():
                 if do_print:
                     if rev == "ANY":
                         do_print = True
-                    elif rev == "TRUE" and currentItem['title'].encode('utf8').startswith("Review of"):
+                    elif rev == "TRUE" and currentItem['title'].startswith("Review of"):
                         do_print = True
-                    elif rev == "FALSE" and currentItem['title'].encode('utf8').startswith("Review of") == False:
+                    elif rev == "FALSE" and currentItem['title'].startswith("Review of") == False:
                         do_print = True
                     else:
                         do_print = False
