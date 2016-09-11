@@ -36,8 +36,8 @@ def printable_heading(x):
         'book': "Books",
         'book_ned': "Books",
         'book_ed': "Edited Volumes",
-        'article_ref': "Articles in Peer-Reviewed Journals",
-        'article_ref_nev': "Articles in Peer-Reviewed Journals",
+        'article_ref': "Journal Articles",
+        'article_ref_nev': "Journal Articles",
         'article_nef_nev': "Other Articles",
         'article_nev': "Other Articles",
         'article': "Articles",
@@ -150,7 +150,12 @@ def print_item(item, eprint_url):
     else:
         oa_status = "[<a href=\"mailto:martin.eve@bbk.ac.uk?subject=Request to read'" + item['title'].encode('utf8') + "'\">Email me to read</a>]"
 
+    if 'oa_status' in item and item['oa_status'] == 'gold' and 'official_url' in item:
+        item['uri'] = item['official_url']
+
     if item['type'] == 'book':
+        if 'mailto:' in oa_status:
+            oa_status = ""
 
         print '<li>{0}, <a href="{4}"><i>{1}</i></a>{5} ({2}: {3}) {6}</li>'.format(creators,
                                                                                 item['title'].encode('utf8'),
