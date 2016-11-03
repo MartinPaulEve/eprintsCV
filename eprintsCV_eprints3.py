@@ -234,7 +234,7 @@ def main():
 
     # download the JSON version
     response = urlopen(url)
-    json_data = response.readall().decode('utf-8')
+    json_data = response.read().decode('utf-8')
 
     # decode the JSON object into a list of dictionaries
     # NB that, helpfully, this list is by default reverse sorted (newest first)
