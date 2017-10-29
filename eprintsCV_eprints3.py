@@ -18,8 +18,8 @@ Options:
 """
 
 import json
-from urllib.request import urlopen
 from datetime import datetime
+from urllib.request import urlopen
 
 from docopt import docopt
 
@@ -145,7 +145,10 @@ def print_item(item, eprint_url):
             elif 'documents' in item:
                 if len(item['documents']) > 1:
                     for doc in item['documents']:
-                        oa_status += " [<a href=\"" + doc['uri'] + "\" style=\"color:" + oa_color + "\">Download " + doc['formatdesc'] + "</a>]"
+                        if 'formatdesc' in doc:
+                            oa_status += " [<a href=\"" + doc['uri'] + "\" style=\"color:" + oa_color + "\">Download " + doc['formatdesc'] + "</a>]"
+                        else:
+                            oa_status += " [<a href=\"" + doc['uri'] + "\" style=\"color:" + oa_color + "\">Download</a>]"
                 else:
                     oa_status = "[<a href=\"" + item['documents'][0]['uri'] + "\" style=\"color:" + oa_color + "\">Download</a>]"
             else:
@@ -165,13 +168,19 @@ def print_item(item, eprint_url):
         if 'mailto:' in oa_status:
             oa_status = ""
 
-        print('<li>{0}, <a href="{4}"><i>{1}</i></a>{5} ({2}: {3}) {6}</li>'.format(creators,
-                                                                                    item['title'],
-                                                                                    item['publisher'],
-                                                                                    the_date,
-                                                                                    item['uri'],
-                                                                                    editors,
-                                                                                    oa_status))
+        if item['ispublished'] == 'inpress':
+            in_press = '[in press]'
+        else:
+            in_press = ''
+
+        print('<li>{0}, <a href="{4}"><i>{1}</i></a>{5} ({2}: {3}) {6} {7}</li>'.format(creators,
+                                                                                        item['title'],
+                                                                                        item['publisher'],
+                                                                                        the_date,
+                                                                                        item['uri'],
+                                                                                        editors,
+                                                                                        oa_status,
+                                                                                        in_press))
 
     if item['type'] == "article":
         creators_replaced = creators.replace('itempropreplace', 'itemprop="author"')
@@ -185,25 +194,37 @@ def print_item(item, eprint_url):
         elif 'number' in item and 'volume' in item:
             volume = ' {0}({1})'.format(str(item['volume']), str(item['number']))
 
-        print ('<li><span itemscope itemtype="http://schema.org/CreativeWork" itemid="{5}">{0}, &ldquo;<a href="{5}"><span itemprop="name">{1}</span></a>&rdquo;, <i><span itemscope itemtype="http://schema.org/Periodical"><span id="name">{2}</span></span></i>{3}, <span itemprop="datepublished">{4}</span></span> {6}</li>'.format(
+        if item['ispublished'] == 'inpress':
+            in_press = '[in press]'
+        else:
+            in_press = ''
+
+        print ('<li><span itemscope itemtype="http://schema.org/CreativeWork" itemid="{5}">{0}, &ldquo;<a href="{5}"><span itemprop="name">{1}</span></a>&rdquo;, <i><span itemscope itemtype="http://schema.org/Periodical"><span id="name">{2}</span></span></i>{3}, <span itemprop="datepublished">{4}</span></span> {6} {7}</li>'.format(
             creators_replaced,
             item['title'],
             item['publication'],
             volume,
             the_date,
             item['uri'],
-            oa_status))
+            oa_status,
+            in_press))
 
     if item['type'] == "book_section":
 
-        print ('<li>{0}, &ldquo;<a href="{6}">{1}</a>&rdquo;, in <i>{2}</i>{3} ({4}: {5}) {7}</li>'.format(creators,
-                                                                                                          item['title'],
-                                                                                                          item['book_title'],
-                                                                                                          editors,
-                                                                                                          item['publisher'],
-                                                                                                          the_date,
-                                                                                                          item['uri'],
-                                                                                                          oa_status))
+        if item['ispublished'] == 'inpress':
+            in_press = '[in press]'
+        else:
+            in_press = ''
+
+        print ('<li>{0}, &ldquo;<a href="{6}">{1}</a>&rdquo;, in <i>{2}</i>{3} ({4}: {5}) {7} {8}</li>'.format(creators,
+                                                                                                               item['title'],
+                                                                                                               item['book_title'],
+                                                                                                               editors,
+                                                                                                               item['publisher'],
+                                                                                                               the_date,
+                                                                                                               item['uri'],
+                                                                                                               oa_status,
+                                                                                                               in_press))
 
     if item['type'] == "conference_item":
         creators_replaced = creators.replace('itempropreplace', 'itemprop="performer"')
