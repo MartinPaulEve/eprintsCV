@@ -60,9 +60,37 @@ def print_item(item, eprint_url):
     editors = ""
     schemaid = ""
 
-    for creator in item['creators'][:-1]:
-        if creators != "":
-            creators += ", "
+    if 'creators' in item:
+        for creator in item['creators'][:-1]:
+            if creators != "":
+                creators += ", "
+
+            lookup = creator['name']['given'] + " " + creator['name']['family']
+
+            shouldcreate = False
+
+            if lookup in schemaids:
+                schemaid = schemaids[lookup]
+            else:
+                schemaids[lookup] = 'itemid="https://www.martineve.com/' + creator['name']['given'] + \
+                                    creator['name']['family'] + '"'
+                schemaid = schemaids[lookup]
+                shouldcreate = True
+
+            if shouldcreate:
+                creators += str.format(
+                    '<span itemtype="http://schema.org/Person" itemscope {2} itempropreplace><span itemprop="name"><span itemprop="familyName">{0}</span>, <span itemprop="givenName">{1}</span></span></span>',
+                    creator['name']['family'], creator['name']['given'], schemaid)
+            else:
+                creators += str.format(
+                    '<span itemtype="http://schema.org/Person" itemscope {2} itempropreplace>{0}, {1}</span>',
+                    creator['name']['family'], creator['name']['given'], schemaid)
+
+    if creators != "":
+        creators += ", and "
+
+    if 'creators' in item:
+        creator = item['creators'][-1]
 
         lookup = creator['name']['given'] + " " + creator['name']['family']
 
@@ -85,46 +113,25 @@ def print_item(item, eprint_url):
                 '<span itemtype="http://schema.org/Person" itemscope {2} itempropreplace>{0}, {1}</span>',
                 creator['name']['family'], creator['name']['given'], schemaid)
 
-    if creators != "":
-        creators += ", and "
-
-    creator = item['creators'][-1]
-
-    lookup = creator['name']['given'] + " " + creator['name']['family']
-
-    shouldcreate = False
-
-    if lookup in schemaids:
-        schemaid = schemaids[lookup]
-    else:
-        schemaids[lookup] = 'itemid="https://www.martineve.com/' + creator['name']['given'] + \
-                            creator['name']['family'] + '"'
-        schemaid = schemaids[lookup]
-        shouldcreate = True
-
-    if shouldcreate:
-        creators += str.format(
-            '<span itemtype="http://schema.org/Person" itemscope {2} itempropreplace><span itemprop="name"><span itemprop="familyName">{0}</span>, <span itemprop="givenName">{1}</span></span></span>',
-            creator['name']['family'], creator['name']['given'], schemaid)
-    else:
-        creators += str.format(
-            '<span itemtype="http://schema.org/Person" itemscope {2} itempropreplace>{0}, {1}</span>',
-            creator['name']['family'], creator['name']['given'], schemaid)
-
     if 'editors' in item:
         for editor in item['editors'][:-1]:
-            if editors == "":
+            if editors == "" and creators == "":
                 editors = ", ed. by "
-            if editors != ", ed. by ":
+            elif editors == "":
+                editors = ", ed. by "
+            if editors != ", ed. by " and editors != ", ed. by ":
                 editors += ", "
 
             editors += str.format('{0}, {1}', editor['name']['family'],
                                   editor['name']['given'])
 
-        if editors == "":
+        if editors == "" and creators == "":
             editors = ", ed. by "
-        if editors != ", ed. by ":
-            editors += ", and "
+        elif editors == "":
+            editors = ", ed. by "
+        if editors != ", ed. by " and editors != ", ed. by ":
+            editors += ", "
+
 
         editor = item['editors'][-1]
 
@@ -173,14 +180,15 @@ def print_item(item, eprint_url):
         else:
             in_press = ''
 
-        print('<li>{0}, <a href="{4}"><i>{1}</i></a>{5} ({2}: {3}) {6} {7}</li>'.format(creators,
+        print('<li>{0}{8}<a href="{4}"><i>{1}</i></a>{5} ({2}: {3}) {6} {7}</li>'.format(creators,
                                                                                         item['title'],
                                                                                         item['publisher'],
                                                                                         the_date,
                                                                                         item['uri'],
                                                                                         editors,
                                                                                         oa_status,
-                                                                                        in_press))
+                                                                                        in_press,
+                                                                                        ', ' if len(creators) > 0 else ''))
 
     if item['type'] == "article":
         creators_replaced = creators.replace('itempropreplace', 'itemprop="author"')
